@@ -11,9 +11,13 @@ import { audioService, brightnessService } from 'src/lib/constants/services';
  * @param self The Widget.Label instance to set up.
  */
 export const setupOsdLabel = (self: Widget.Label): void => {
-    self.hook(brightnessService, 'notify::screen', () => {
+    self.hook(brightnessService, 'notify::screens', () => {
         self.className = self.className.replace(/\boverflow\b/, '').trim();
-        self.label = `${Math.round(brightnessService.screen * 100)}`;
+        const devices = brightnessService.getScreenDevices();
+        if (devices.length > 0) {
+            const mainScreen = brightnessService.getScreenBrightness(devices[0]);
+            self.label = `${Math.round(mainScreen * 100)}`;
+        }
     });
 
     self.hook(brightnessService, 'notify::kbd', () => {
